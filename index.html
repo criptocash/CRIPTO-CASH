@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cripto Cash</title>
+  <style>
+    body {margin: 0; font-family: Arial, sans-serif; background-color: #0f172a; color: white;}
+    header {background: linear-gradient(90deg, #1e3a8a, #9333ea); padding: 20px; text-align: center;}
+    header h1 {margin: 0; font-size: 2.5rem; cursor: pointer;}
+    nav {margin-top: 10px;}
+    nav a {margin: 0 15px; text-decoration: none; color: white; font-weight: bold;}
+    .hero {background: url('https://images.unsplash.com/photo-1641989795745-7a4e8a4b2ac4') no-repeat center/cover; height: 70vh; display: flex; align-items: center; justify-content: center; text-align: center;}
+    .hero h2 {font-size: 3rem; background-color: rgba(0,0,0,0.6); padding: 15px; border-radius: 10px;}
+    .form-section {background: #1e293b; padding: 40px; text-align: center;}
+    .form-section h2 {margin-bottom: 20px;}
+    form {max-width: 400px; margin: auto; display: flex; flex-direction: column; gap: 15px;}
+    input, select {padding: 12px; border-radius: 10px; border: none;}
+    button {padding: 12px; border: none; border-radius: 10px; background: #9333ea; color: white; font-size: 1rem; cursor: pointer;}
+    #user-panel {margin-top: 30px; padding: 20px; background: #1e293b; border-radius: 15px; max-width: 500px; margin-left: auto; margin-right: auto; display: none;}
+    #user-panel h3 {margin-bottom: 10px;}
+    #payment-section {margin-top: 20px; padding: 20px; background: #1e293b; border-radius: 15px; display: none;}
+    #qr-code {margin-top: 15px;}
+    .forgot {margin-top: 10px; display: block; color: #38bdf8; cursor: pointer;}
+    .logout-btn {margin-top: 15px; padding: 10px; border: none; border-radius: 10px; background: #ef4444; color: white; cursor: pointer;}
+  </style>
+</head>
+<body>
+  <header>
+    <h1 onclick="goHome()">💰 Cripto Cash</h1>
+    <nav>
+      <a href="#registro">Crear Cuenta</a>
+      <a href="#login">Iniciar Sesión</a>
+    </nav>
+  </header>
+
+  <section class="hero" id="inicio">
+    <h2>Invierte en tu Futuro con Cripto Cash</h2>
+  </section>
+
+  <section class="form-section" id="registro">
+    <h2>Regístrate en Cripto Cash</h2>
+    <form id="registerForm">
+      <input type="text" id="name" placeholder="Nombre completo" required>
+      <input type="email" id="email" placeholder="Correo electrónico" required>
+      <input type="password" id="password" placeholder="Contraseña" required>
+      <button type="submit">Crear Cuenta</button>
+    </form>
+    <span class="forgot" onclick="forgotPassword()">¿Olvidaste tu contraseña?</span>
+  </section>
+
+  <section class="form-section" id="login">
+    <h2>Inicia Sesión</h2>
+    <form id="loginForm">
+      <input type="email" id="loginEmail" placeholder="Correo electrónico" required>
+      <input type="password" id="loginPassword" placeholder="Contraseña" required>
+      <button type="submit">Entrar</button>
+    </form>
+  </section>
+
+  <section class="investment-section" id="inversion">
+    <h2>Crea tu Fondo de Inversión</h2>
+    <p>Selecciona uno de nuestros planes con duración de <strong>8 meses</strong> y <strong>25% de ganancia mensual</strong>.</p>
+    <div class="plans">
+      <div class="plan"><h3>$500 USD</h3><p>Duración: 8 meses</p><p>Ganancia mensual: 25%</p><button onclick="selectPlan(500)">Invertir</button></div>
+      <div class="plan"><h3>$1,000 USD</h3><p>Duración: 8 meses</p><p>Ganancia mensual: 25%</p><button onclick="selectPlan(1000)">Invertir</button></div>
+      <div class="plan"><h3>$3,000 USD</h3><p>Duración: 8 meses</p><p>Ganancia mensual: 25%</p><button onclick="selectPlan(3000)">Invertir</button></div>
+      <div class="plan"><h3>$5,000 USD</h3><p>Duración: 8 meses</p><p>Ganancia mensual: 25%</p><button onclick="selectPlan(5000)">Invertir</button></div>
+      <div class="plan"><h3>$10,000 USD</h3><p>Duración: 8 meses</p><p>Ganancia mensual: 25%</p><button onclick="selectPlan(10000)">Invertir</button></div>
+    </div>
+
+    <div id="user-panel">
+      <h3>Panel del Usuario</h3>
+      <p><strong>Nombre:</strong> <span id="panel-name"></span></p>
+      <p><strong>Correo:</strong> <span id="panel-email"></span></p>
+      <p><strong>Fondo Seleccionado:</strong> <span id="panel-plan"></span></p>
+      <p><strong>Ganancia Total (8 meses):</strong> <span id="panel-gain"></span></p>
+      <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
+    </div>
+
+    <div id="payment-section">
+      <h3>Realizar Pago</h3>
+      <p>Selecciona tu método de pago con criptomonedas:</p>
+      <select id="crypto-payment">
+        <option value="btc">Bitcoin (BTC)</option>
+        <option value="eth">Ethereum (ETH)</option>
+        <option value="usdt">Tether (USDT)</option>
+      </select>
+      <button onclick="processPayment()">Pagar</button>
+      <div id="qr-code"></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2025 Cripto Cash - Todos los derechos reservados</p>
+  </footer>
+
+  <script>
+    let user = null;
+    let users = JSON.parse(localStorage.getItem('users') || '[]');
+
+    function saveUsers(){ localStorage.setItem('users', JSON.stringify(users)); }
+    function mostrarPanelUsuario(){
+      if(!user) return;
+      document.getElementById("panel-name").innerText = user.name;
+      document.getElementById("panel-email").innerText = user.email;
+      document.getElementById("panel-plan").innerText = user.plan || "Ningún plan seleccionado";
+      document.getElementById("panel-gain").innerText = user.gain || "-";
+      document.getElementById("user-panel").style.display = "block";
+    }
+    function logout(){ user=null; document.getElementById("user-panel").style.display="none"; document.getElementById("payment-section").style.display="none"; alert("Has cerrado sesión correctamente"); }
+
+    document.getElementById("registerForm").addEventListener("submit", function(e){
+      e.preventDefault();
+      const name=document.getElementById("name").value;
+      const email=document.getElementById("email").value;
+      const password=document.getElementById("password").value;
+      if(users.some(u=>u.email===email)){alert("Este correo ya está registrado"); return;}
+      user={name,email,password,plan:null,gain:null};
+      users.push(user); saveUsers(); mostrarPanelUsuario();
+      // Simulación de envío de correo de confirmación
+      alert(`Cuenta creada con éxito. Se ha enviado un correo de confirmación a ${email}`);
+    });
+
+    document.getElementById("loginForm").addEventListener("submit",function(e){
+      e.preventDefault();
+      const email=document.getElementById("loginEmail").value;
+      const password=document.getElementById("loginPassword").value;
+      const foundUser=users.find(u=>u.email===email&&u.password===password);
+      if(foundUser){user=foundUser; alert("Inicio de sesión exitoso"); mostrarPanelUsuario();}
+      else{alert("Correo o contraseña incorrectos");}
+    });
+
+    function selectPlan(amount){
+      if(!user){alert("Debes crear una cuenta o iniciar sesión antes de invertir"); document.getElementById("registro").scrollIntoView({behavior:'smooth'}); return;}
+      const monthlyGain=amount*0.25; const totalGain=monthlyGain*8;
+      user.plan=`$${amount} USD - 8 meses - 25% mensual`; user.gain=`$${(amount+totalGain).toLocaleString()}`; saveUsers(); mostrarPanelUsuario();
+      document.getElementById("payment-section").style.display="block";
+      alert(`Has seleccionado el plan de $${amount} USD. Ganancia total estimada: ${user.gain}`);
+    }
+
+    function processPayment(){
+      const method=document.getElementById("crypto-payment").value; let address='';
+      if(method==='btc') address='1BoatSLRHtKNngkdXEeobR76b53LETtpyT';
+      if(method==='eth') address='0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
+      if(method==='usdt') address='TYMwiDuG8S5Y7uhRr6jd8kY7yR6r6rYrZr';
+      document.getElementById('qr-code').innerHTML=`<p>Dirección de pago: ${address}</p><img src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${address}' alt='QR de pago'>`;
+    }
+
+    function forgotPassword(){ const email=prompt("Introduce tu correo electrónico para restablecer la contraseña:"); if(email){ alert("Se ha enviado un correo para restablecer la contraseña (simulado)"); } }
+    function goHome(){ window.scrollTo({top:0, behavior:'smooth'}); }
+  </script>
+</body>
+</html>
